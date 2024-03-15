@@ -6,7 +6,7 @@ st.set_page_config(layout="wide")
 if 'page' not in st.session_state:
     st.session_state['page'] = 'HOME'
 
-menus={'HOME':home,"Map":map}
+menus={'HOME':home,"Map":mapping}
 
 with st.sidebar:
     for menu in menus.keys():

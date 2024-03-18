@@ -1,12 +1,11 @@
 import streamlit as st
 from page import *
 
-st.set_page_config(layout="wide")
 
 if 'page' not in st.session_state:
-    st.session_state['page'] = 'HOME'
+    st.session_state['page'] = '날짜별'
 
-menus={'HOME':home,"Map":mapping}
+menus={'날짜별':home,"위판장별":map}
 
 with st.sidebar:
     for menu in menus.keys():

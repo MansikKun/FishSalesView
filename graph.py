@@ -13,8 +13,8 @@ from streamlit_folium import st_folium
 #한글폰트 지정
 plt.rcParams['font.family'] ='Malgun Gothic'
 
-df_fish = pd.read_csv('C:\workspace\FishSalesView\data\해양수산부_위판장별위탁판매현황.CSV', encoding='cp949')
-df_shop = pd.read_csv('C:\workspace\FishSalesView\data\산지위판장.csv', encoding='cp949')
+df_fish = pd.read_csv('C:\workspace\FisherySalesView\data\해양수산부_위판장별위탁판매현황.CSV', encoding='cp949')
+df_shop = pd.read_csv('C:\workspace\FisherySalesView\data\산지위판장.csv', encoding='cp949')
 df = pd.DataFrame(df_fish)
 def date_amount(selected_fishes):
     #위판일자 데이터를 문자열이아닌 데이트타임타입으로 변경
@@ -79,7 +79,7 @@ def map_maker():
     df_shop.dropna(subset=['위도', '경도'], inplace=True)
 
     # 지도 생성 및 마커 추가
-    m = folium.Map(location=[37.5665, 126.9780], zoom_start=10)
+    m = folium.Map(location=[37.5665, 126.9780], zoom_start=7)
     marker_cluster = MarkerCluster().add_to(m)
 
     for idx, row in df_shop.iterrows():
@@ -100,18 +100,36 @@ def hitmap(filtered_df):
     return st.pyplot(fig)
     
     pass
-def round(association_data):
+def round(association_data,toggle_merge):
 
-    # 어종별 위판수량 집계
-    species_counts = association_data.groupby('수산물표준코드명')['위판수량'].mean()
-    #수량 크기대로 내림차순 정리
-    df_sorted = species_counts.sort_values(ascending=False)
+    if toggle_merge:
+        # 어종별 위판수량 집계
+        species_counts = association_data.groupby('수산물표준코드명')['위판수량'].mean()
+        # 수량 크기대로 내림차순 정리
+        df_sorted = species_counts.sort_values(ascending=False)
+        # 퍼센트 게이지 범위 설정, 너무 작은 것들 합치기
+        threshold = 0.03 
+        other = df_sorted[df_sorted / df_sorted.sum() < threshold].sum()
+        df_filtered = df_sorted[df_sorted / df_sorted.sum() >= threshold]
+        df_filtered['기타'] = other  # 너무 작은 값들을 '기타'로 합침
+    else:
+        # 어종별 위판수량 집계만 진행
+        species_counts = association_data.groupby('수산물표준코드명')['위판수량'].mean()
+        df_filtered = species_counts.sort_values(ascending=False)
+
     # 원그래프 그리기
     fig, ax = plt.subplots(figsize=(10, 8.5))
-    ax.pie(df_sorted, labels=species_counts.index, autopct='%1.1f%%',textprops={'fontsize': 10})
+    wedges, texts, autotexts = ax.pie(df_filtered, 
+                                      labels=df_filtered.index, 
+                                      autopct='%1.1f%%', 
+                                      textprops={'fontsize': 10})
+
     ax.axis('equal')  # 동그란 원 형태 유지
+    ax.legend(wedges, df_filtered.index,
+              title="수산물표준코드명",
+              loc="center left",
+              bbox_to_anchor=(1, 0, 0.5, 1))
 
     # 스트림릿에서 그래프 출력
     st.pyplot(fig)
-    pass
 #-------------------------

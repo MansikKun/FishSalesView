@@ -125,8 +125,9 @@ def round(association_data,toggle_merge):
                                       textprops={'fontsize': 10})
 
     ax.axis('equal')  # 동그란 원 형태 유지
+    #어종따로 표시
     ax.legend(wedges, df_filtered.index,
-              title="수산물표준코드명",
+              title="어종",
               loc="center left",
               bbox_to_anchor=(1, 0, 0.5, 1))
 

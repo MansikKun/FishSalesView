@@ -108,7 +108,7 @@ def round(association_data,toggle_merge):
         # 수량 크기대로 내림차순 정리
         df_sorted = species_counts.sort_values(ascending=False)
         # 퍼센트 게이지 범위 설정, 너무 작은 것들 합치기
-        threshold = 0.03 
+        threshold = 0.028 
         other = df_sorted[df_sorted / df_sorted.sum() < threshold].sum()
         df_filtered = df_sorted[df_sorted / df_sorted.sum() >= threshold]
         df_filtered['기타'] = other  # 너무 작은 값들을 '기타'로 합침
